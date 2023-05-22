@@ -3,15 +3,12 @@ from setuptools import setup
 install_requires = ["setuptools", "pydot"]
 
 setup(
-        name = 'vector_map'
-        version = '0.1'
-        package = find_package()
+        name = 'vector_map',
+        version = '0.1',
+        packages=['vector_map'],
         install_requires = [
             'numpy',
-            'opencv',
-            'opencv-contrib',
+            'opencv-python',
+            'opencv-contrib-python',
             ]
 )
-
-
-            
