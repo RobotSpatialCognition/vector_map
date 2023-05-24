@@ -1,18 +1,22 @@
 # vector_map
 
-Install
+##Install
 
 ```
+mkdir <work_dir>
+
+cd <work_dir>
+
 git clone https://github.com/RobotSpatialCognition/vector_map.git
 
 cd vector_map
  -> <work_dir>/vector_map
+ 
 pip3 install -e .
-
 ```
 
 
-usage test1.py
+##usage demo
 ```
 cd test
 -> <work_dir>/vector_map/test
