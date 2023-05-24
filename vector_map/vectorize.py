@@ -509,6 +509,48 @@ def rotation(img, angle = -233):
     # pp.imshow(image2)
     return image2
 
+def addition_property(bin_raster):
+	raster = np.pad(bin_raster, 10, constant_values=0) ##padding 各方向に10画素ずつ
+	raster = raster.astype(np.int32) ##要素の型変更
+	p_map = wall_detected1(raster) ##壁とそれ以外を分類
+	p2_map = wall_detected2(p_map,raster) ##暫定コーナーの抽出
+	p3_map = wall_detected3(p2_map, raster) ##内部と外部を塗り分け
+	p = renew_corner_func(p3_map, raster) ##暫定コーナーをコーナーにする処理
+	corner_list = get_corner_list_from_pm(p)
+	p = p[10:np.shape[0]-10,10:np.shape[1] -10]
+	return p, corner_list
+
+def approximate_corner(tmp_property,tmp_corners):
+	cp_property = tmp_property.copy()
+	cp_property[cp_property == 1] = 19# 内部塗りつぶし
+
+
+	sort = wallsort(cp_property)
+
+	sorted_corner = sort_corner(tmp_corners, sort)
+
+	reduced_corner = la(sorted_corner, 3)
+	reduced_corner_cv2 = []
+	for py,px in reduced_corner:
+		reduced_corner_cv2.append((px,py))
+	degree_list = calc_degree(reduced_corner,tmp_property)
+	
+	testp = tmp_property.copy()
+	for point in tmp_corners:
+		testp[point] = 12
+
+	for point in reduced_corner:
+		testp[point]=15
+	
+	clist, dlist  = delete_180(reduced_corner, degree_list)
+	for point in tmp_corners:
+		testp[point] = 12
+
+	for point in clist:
+		testp[point]=15
+
+	return testp, clist, dlist
+
 
 def getMovePoint(img_org):
 	# img_org = cv2.imread(pgm_array,cv2.IMREAD_GRAYSCALE) ##読み込み
@@ -518,6 +560,9 @@ def getMovePoint(img_org):
 	skeleton_map = gen_sk_map(img_org, 11) ##スケルトンマップの生成　（0,255)
 	# debug.show(skeleton_map)
 	# cv2.imwrite("./latex_data/skeletonmap2.png",skeleton_map)
+
+
+	##関数化済み　->addition_property()
 	tmp_sk =skeleton_map/255##(0,1)のスケルトンマップに変更
 
 	tmp_sk = np.pad(tmp_sk, 10, constant_values=0) ##padding 各方向に10画素ずつ
@@ -528,12 +573,12 @@ def getMovePoint(img_org):
 	p = renew_corner_func(p3_map, tmp_sk) ##暫定コーナーをコーナーにする処理
 	corner_list = get_corner_list_from_pm(p)
 
+	###関数化済み -> approximate_corner
+
 	p[p == 1] = 19# 内部塗りつぶし
 
 
 	sort = wallsort(p)
-
-
 
 	sorted_corner = sort_corner(corner_list, sort)
 
@@ -543,7 +588,7 @@ def getMovePoint(img_org):
 		reduced_corner_cv2.append((px,py))
 
 
-	img = mono2color(tmp_sk)
+	# img = mono2color(tmp_sk)
 	# debug.show(img)
 
 
@@ -572,11 +617,14 @@ def getMovePoint(img_org):
 		testp[point]=15
 	# debug.show(debug.coloring_img(testp))
 	# cv2.imwrite("/Users/wataru/MapLibrary/demo_maplibrary/demo_maplibrary/demo_maplibrary/latex_data/linear_approx.png",debug.coloring_img(testp))
+	###############################
+	
 	output = clist
-
+	
+	###########分割関数
 	nodes = search_nearpoint(clist, dlist)
 
-
+	img = mono2color(tmp_sk)
 	binimg = img * 255
 	for points in nodes:
 		cv2.line(binimg, (int(points[0][1]),int(points[0][0])), (int(points[1][1]),int(points[1][0])), (255,255,255), thickness=1, lineType=cv2.LINE_8, shift=0)
@@ -632,9 +680,9 @@ def getMovePoint(img_org):
 				line_type=cv2.LINE_4
 				)
 	# debug.show(color_src)
-	cv2.imwrite("./latex_data/devide_jp.png",color_src)
+	# cv2.imwrite("./latex_data/devide_jp.png",color_src)
 
-
+	#########
 
 
 	#隣接行列作成
