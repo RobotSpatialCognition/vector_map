@@ -10,5 +10,6 @@ setup(
             'numpy',
             'opencv-python',
             'opencv-contrib-python',
+            'sympy',
             ]
 )

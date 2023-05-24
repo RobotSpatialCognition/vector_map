@@ -463,9 +463,9 @@ def make_mapbb(img):
     dy = max_vy-min_vy
     d = max(dx,dy)
     r = (np.sqrt(2)*d)//2
-    print(f"r={r}")
+    # print(f"r={r}")
     center = ((min_vx+max_vx)//2, (min_vy+max_vy)//2)
-    print(f"center={center}")
+    # print(f"center={center}")
     # lu = (int(center[0]-r), int(center[1]-r))
     # ru = (int(center[0]-r), int(center[1]+r))
     # lb = (int(center[0]+r), int(center[1]-r))
@@ -483,7 +483,7 @@ def make_mapbb(img):
 
 def img_crop(img):
 	center ,r = make_mapbb(img)
-	print(center,r)
+	# print(center,r)
 	if 2*r < img.shape[0] and 2*r < img.shape[1]:
 		img = img[center[1]-r:center[1]+r, center[0]-r:center[0]+r]
 		return img,(center[1]-r, center[0]-r) 
