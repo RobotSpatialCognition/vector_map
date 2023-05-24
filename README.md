@@ -1,6 +1,6 @@
 # vector_map
 
-##Install
+## Install
 
 ```
 mkdir <work_dir>
@@ -16,7 +16,7 @@ pip3 install -e .
 ```
 
 
-##usage demo
+## usage demo
 ```
 cd test
 -> <work_dir>/vector_map/test
