@@ -18,10 +18,7 @@ pip3 install -e .
 
 ## usage demo
 ```
-cd test
--> <work_dir>/vector_map/test
-
-python3 test1.py
+python3 test/test1.py
 ```
 
 
