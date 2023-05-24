@@ -6,7 +6,7 @@ from vector_map.visualize import init_visualize
 
 class MapHandleUI:
     def __init__(self) -> None:
-        world = get_map_ROS("resource/map")
+        world = get_map_ROS("../resource/map")
         r = world.get_root_region()
 
         ss = SimulationSpace(r)
