@@ -29,12 +29,13 @@ setup(
         'Topic :: Software Development :: Libraries'
         ],
         description=(
-            "A development tool to create ROS package based on "
-            "behaviour trees framework."
+            "A tool for generating vectorized map from SLAM output."
         ),
         long_description=(
-            "A development tool to create ROS package based on "
-            "behaviour trees framework."
+            "A tool for generating vectorized map from SLAM output."
+            "The vectorized map consists from a set of geometric components "
+            "such as straight lines and curves, and is suitable for "
+            "action planning of robots."
         ),
         license='MIT',
 
