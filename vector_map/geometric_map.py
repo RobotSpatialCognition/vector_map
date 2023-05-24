@@ -33,7 +33,7 @@ class Boundary:
         return self.segment.intersect(shape)
 
 class View:
-    def __init__(self, belong:Region) -> None:
+    def __init__(self, belong) -> None:
         if belong:
             self.belong = belong
             self.boundaries = belong.boundaries

@@ -1,12 +1,13 @@
 #raster: Point cloud representation
 #map: Vector representation
-import vectorize 
+
+from vector_map import vectorize
 from enum import Enum
 import numpy as np
 import os
 import cv2
 import yaml
-from .geometric_map import World
+from vector_map.geometric_map import World
 #@dataclass
 class Raster:
 	#data:boolの配列にすべき
@@ -23,11 +24,11 @@ class PixType(Enum):
 
 
 class VectorMap:
-	def __init__(self,raster,ksize=11, epsilon=3):
+	def __init__(self,raster,ksize=4, epsilon=3):
 		self.raster = raster
 		data = raster.data #ndarray
-		img = self.make_mapbb(data)
-		croped_raster,offset = vectorize.img_crop(img)
+		center, r  = vectorize.make_mapbb(data)
+		croped_raster,offset = vectorize.img_crop(data)
 		self.denoised_raster = vectorize.gen_sk_map(croped_raster, ksize)
 		bin_raster = self.denoised_raster/255
 		# bin_raster = np.pad(bin_raster, 10, constant_values=0)

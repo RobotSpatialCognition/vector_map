@@ -1,7 +1,7 @@
 import threading
 
 from sympy import Segment
-from . import Region
+from vector_map.geometric_map import Region
 from tkinter import Tk, Canvas, BOTH, Label, FIRST, LAST
 
 root = None

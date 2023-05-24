@@ -1,11 +1,10 @@
 import cv2
 import numpy as np
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import datetime
 import time
 import math
 import random
-import debug
 
 tp = [(-1,0),(0,1),(1,0),(0,-1),(-1,1), (1,1), (1,-1),(-1,-1) ]
 til_list = [(-1,-1),(-1,1),(1,-1),(1,1)]
@@ -517,7 +516,7 @@ def addition_property(bin_raster):
 	p3_map = wall_detected3(p2_map, raster) ##内部と外部を塗り分け
 	p = renew_corner_func(p3_map, raster) ##暫定コーナーをコーナーにする処理
 	corner_list = get_corner_list_from_pm(p)
-	p = p[10:np.shape[0]-10,10:np.shape[1] -10]
+	# p = p[10:p.shape[0]-10,10:p.shape[1]-10]
 	return p, corner_list
 
 def approximate_corner(tmp_property,tmp_corners):
