@@ -1,23 +1,11 @@
-import sys
-import cv2
-
 from sympy import Point, Ray
 
 from ..vector_map import *
 
 class MapHandleUI:
     def __init__(self) -> None:
-        
-        get_map_ROS("../resource/")
-        map = cv2.imread('kenA_rote.pgm', cv2.IMREAD_GRAYSCALE)
-        #map = cv2.imread('map.pgm', cv2.IMREAD_GRAYSCALE)
-        mapcenter , r = mlb.make_mapbb(map)
-        img_org = map[mapcenter[1]-r:mapcenter[1]+r, mapcenter[0]-r:mapcenter[0]+r]
-
-        a,b,c,map = mlb.getMovePoint(img_org)
-
-        r = Region(map.tolist())
-        self.region = r
+        world = get_map_ROS("../resource/")
+        r = world.get_root_region()
 
         ss = SimulationSpace()
         self.simulation_space = ss
