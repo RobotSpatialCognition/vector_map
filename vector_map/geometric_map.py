@@ -1,5 +1,4 @@
 from enum import Enum
-
 import math
 from operator import itemgetter
 
@@ -80,7 +79,7 @@ class Region:
         points = []
         for b in outer:
             points.append(b.start)
-#        self.outer_boundary = Polygon(points)
+        self.outer_polygon = Polygon(*points)
         self.corner_points = points
         self.parent_view = view
         self.views = {}
@@ -88,20 +87,22 @@ class Region:
         self.default_view = View(self)
 
     def get_circumference(self):
-        return self.outer_boundary
+        return self.outer_polygon
 
     def get_weight_center(self):
-        return self.outer_boundary.center
+        return self.outer_polygon.center
 
     def get_corner_points(self):
         return self.corner_points
 
     def is_inside(self, point):
-        return self.outer_boundary.encloses_point(point)
+        return self.outer_polygon.encloses_point(point)
 
     def get_near_boundaries(self, point:Point, thresh=1):
         cand = []
-        for b in self.physical_boundaries:
+        boundaries = [self.outer_boundary] + self.inner_boundaries
+        for b in boundaries:
+            if b.type != BoundaryType.INNER and b.type != BoundaryType.OUTER: continue
             dl = float(b.distance(point))
             if dl > thresh: continue
             cand.append((dl, b))

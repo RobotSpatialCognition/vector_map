@@ -1,13 +1,15 @@
 #raster: Point cloud representation
 #map: Vector representation
 
-from vector_map import vectorize
 from enum import Enum
 import numpy as np
 import os
 import cv2
 import yaml
-from vector_map.geometric_map import World
+
+from . import vectorize
+from .geometric_map import World
+
 #@dataclass
 class Raster:
 	#data:boolの配列にすべき

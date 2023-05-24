@@ -1,5 +1,6 @@
 import sys
 sys.path.append(".")
+
 from vector_map import *
 
 init_visualize()
