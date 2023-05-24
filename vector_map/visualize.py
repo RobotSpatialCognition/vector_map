@@ -29,9 +29,9 @@ class SimulationSpace:
         canvas = Canvas(root, width=1000, height=1250)
         self.canvas = canvas
         self.world = region.world
-        self.origin = region.world.map.origin
+        self.origin = region.world.map.raster.origin
         first = True
-        for b in region.outer_boundaries:
+        for b in region.outer_boundary:
             l = b.segment
             x = l.p1.x
             y = l.p1.y
@@ -55,7 +55,7 @@ class SimulationSpace:
             if scale_x > scale_y: self.scale = scale_y 
             else: self.scale = scale_x
             self.total_y = range_y * self.scale
-        for b in region.outer_boundaries:
+        for b in region.outer_boundary:
             self.draw_line(b.segment)
         self.canvas.pack()
         self.callback = {}

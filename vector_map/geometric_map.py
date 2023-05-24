@@ -36,9 +36,11 @@ class View:
     def __init__(self, belong) -> None:
         if belong:
             self.belong = belong
-            self.boundaries = belong.boundaries
+            self.outer_boundary = belong.outer_boundary
+            self.inner_boundaries = belong.inner_boundaries
+            self.world = belong.world
         self.subregions = []
-        self.world = belong.world
+        
     
     def get_subregions(self):
         return self.subregions
@@ -52,17 +54,17 @@ class World:
         self.boundaries = []
         ord = 0
         outer = []
-        for p in map:
+        for p in corner_map:
             boundary = Boundary(last, p, ord, BoundaryType.OUTER)
             outer.append(boundary)
             last = p
             ord += 1
         boundary = Boundary(last, first, ord, BoundaryType.OUTER)
         outer.append(boundary)
-        self.boundaries.append(outer)
+        self.outer = outer
         dummy = View(None)
         dummy.world = self
-        self.root_region = Region(self.boundaries, dummy)
+        self.root_region = Region(outer, dummy)
         self.regions = [self.root_region]
     
     def get_root_region(self):
@@ -73,13 +75,17 @@ class World:
     
 class Region:
     def __init__(self, outer:list, view, inner=[]) -> None:
-        self.outer_boundaries = outer
-        self.islands = inner
-        self.outer_boundary = Polygon(outer)
+        self.outer_boundary = outer
+        self.inner_boundaries = inner
+        points = []
+        for b in outer:
+            points.append(b.start)
+#        self.outer_boundary = Polygon(points)
+        self.corner_points = points
         self.parent_view = view
-        self.default_view = View(self)
         self.views = {}
         self.world = view.world
+        self.default_view = View(self)
 
     def get_circumference(self):
         return self.outer_boundary
@@ -88,7 +94,7 @@ class Region:
         return self.outer_boundary.center
 
     def get_corner_points(self):
-        return self.outer_boundaries
+        return self.corner_points
 
     def is_inside(self, point):
         return self.outer_boundary.encloses_point(point)
