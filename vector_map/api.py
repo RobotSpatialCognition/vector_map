@@ -6,6 +6,7 @@ import numpy as np
 import os
 import cv2
 import yaml
+from .geometric_map import World
 #@dataclass
 class Raster:
 	#data:boolの配列にすべき
