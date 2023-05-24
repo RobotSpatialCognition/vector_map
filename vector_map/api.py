@@ -12,7 +12,7 @@ class Raster:
 	#data:boolの配列にすべき
 	pass
 
-class Property(Raster):
+class RasterProperty(Raster):
 	pass
 	
 class PixType(Enum):
@@ -82,7 +82,7 @@ class VectorMap:
 
 
 	def get_raster_property(self):
-		prop = Property()
+		prop = RasterProperty()
 		prop.data = self.pix_property
 		#raster.center = self.raster ##offset分と計算した値
 		prop.scale = self.raster.scale

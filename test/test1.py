@@ -3,13 +3,12 @@ import cv2
 
 from sympy import Point, Ray
 
-sys.path.append('/home/tago/map/geometric_map')
-from geometric_map.visualize import SimulationSpace
-import demo_maplibrary.demo_maplibrary.demo_maplibrary as mlb
-from geometric_map.api import World, Region, Object
+from ..vector_map import *
 
 class MapHandleUI:
     def __init__(self) -> None:
+        
+        get_map_ROS("../resource/")
         map = cv2.imread('kenA_rote.pgm', cv2.IMREAD_GRAYSCALE)
         #map = cv2.imread('map.pgm', cv2.IMREAD_GRAYSCALE)
         mapcenter , r = mlb.make_mapbb(map)
