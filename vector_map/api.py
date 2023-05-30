@@ -26,22 +26,19 @@ class PixType(Enum):
 
 
 class VectorMap:
-	def __init__(self,raster,ksize=4, epsilon=3):
+	def __init__(self,raster,ksize=11, epsilon=3):
 		self.raster = raster
+		self.offset_x = 0
+		self.offset_y = 0
+		self.rotation = 0
+
 		data = raster.data #ndarray
 		center, r  = vectorize.make_mapbb(data)
 		croped_raster,offset = vectorize.img_crop(data)
 		self.denoised_raster = vectorize.gen_sk_map(croped_raster, ksize)
-		bin_raster = self.denoised_raster/255
-		# bin_raster = np.pad(bin_raster, 10, constant_values=0)
-		# bin_raster = bin_raster.astype(np.int32)
-	
-		# p_map = vectorize.wall_detected1(bin_raster) ##壁とそれ以外を分類
-		# p2_map = vectorize.wall_detected2(p_map,bin_raster) ##暫定コーナーの抽出
-		# p3_map = vectorize.wall_detected3(p2_map, bin_raster) ##内部と外部を塗り分け
-		# p = vectorize.renew_corner_func(p3_map, bin_raster)
-		# corner_list = vectorize.get_corner_list_from_pm(p)
-		tmp_property, corner_list = vectorize.addition_property(bin_raster)
+		self.bin_raster = self.denoised_raster/255
+		self.shapeup_raster()
+		tmp_property, corner_list = vectorize.addition_property(self.bin_raster)
 		temp, clist, dlist = vectorize.approximate_corner(tmp_property, corner_list)
 
 
@@ -52,7 +49,6 @@ class VectorMap:
 		self.corners[:,0] += offset[0]
 		self.corners[:,1] += offset[1]
 
-		# nodes = vectorize.search_nearpoint(clist, dlist)
 
 
 
@@ -60,7 +56,6 @@ class VectorMap:
 	def get_denoised_raster(self):
 		raster = Raster()
 		raster.data = self.denoised_raster
-		# raster.center = self.raster ##offset分と計算した値
 		raster.scale = self.raster.scale
 		return raster
 
@@ -68,18 +63,25 @@ class VectorMap:
 		shape = self.raster.shape
 		resolution = self.raster.resolution
 		origin = self.raster.origin
-		base_x = -0.75 #pix * resolution
-		base_y = shape[1]*resolution - 1.1
+		# base_x = -0.75 #pix * resolution
+		# base_y = shape[1]*resolution - 1.1
+
+		base_x = self.offset_x
+		base_y = shape[1]*resolution + self.offset_y 
+
     	# further adjustment: move origin from (0, 0) to config.origin
 		base_x += origin[0]
 		base_y += origin[1]
-		return float(p[1])*resolution+base_x, -float(p[0])*resolution+base_y
+
+		return float(p[1])*resolution+base_x, -float(p[0])*resolution+base_y 
 
 	def get_corners(self):
 		# デカルト座標でoriginを原点とした座標点のリスト
 		points = []
 		for p in self.corners:
 			points.append(self.get_coord(p))
+		print(points)
+		print(len(points))
 		return points
 
 
@@ -87,9 +89,19 @@ class VectorMap:
 	def get_raster_property(self):
 		prop = RasterProperty()
 		prop.data = self.pix_property
-		#raster.center = self.raster ##offset分と計算した値
 		prop.scale = self.raster.scale
 		return prop
+
+	def shapeup_raster(self):
+		self.bin_raster = np.pad(self.bin_raster, 10, constant_values=0)
+		self.offset_x += 10 * self.raster.resolution 
+		self.offset_y += 10 * self.raster.resolution 
+		#clip
+		
+
+
+
+
 
 
 def get_map_ROS(dir):

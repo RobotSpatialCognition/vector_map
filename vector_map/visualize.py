@@ -47,8 +47,8 @@ class SimulationSpace:
                 elif x < min_x: min_x = x
                 if y > max_y: max_y = y
                 elif y < min_y: min_y = y
-            self.offset_x = min_x + 1.5 # vertical margin of the display
-            self.offset_y = min_y + 1.9 # horizontal margin of the display
+            self.offset_x = min_x + 1.5 
+            self.offset_y = min_y + 1.9 
             range_x = max_x - min_x
             range_y = max_y - min_y
             scale_x = WINDOW_X / (range_x + 1)
@@ -74,10 +74,12 @@ class SimulationSpace:
         else:
             x = loc[0]
             y = loc[1]
-        x -= self.origin[0] # offset origin
-        y -= self.origin[1]
-        pix_x = int((x - self.offset_x) * self.scale) # offset margin
+
+        pix_x = int((x - self.offset_x) * self.scale) 
         pix_y = int((-y + self.offset_y) * self.scale + self.total_y)
+        pix_x -= self.origin[0]
+        pix_y += self.origin[1]
+        
         return pix_x, pix_y
 
     def pix_to_coord(self, *pix):
@@ -92,8 +94,10 @@ class SimulationSpace:
         else:
             x = float(pix[0])
             y = float(pix[1])
-        loc_x = x / self.scale + self.offset_x + self.origin[0]
-        loc_y = (self.total_y - y) / self.scale + self.offset_y + self.origin[1]
+            x -= self.origin[0] 
+            y -= self.origin[1]
+        loc_x = x / self.scale + self.offset_x #+ self.origin[0]
+        loc_y = (self.total_y - y) / self.scale + self.offset_y #+ self.origin[1]
         return loc_x, loc_y
     
     def draw_line(self, line:Segment, arrow=None):

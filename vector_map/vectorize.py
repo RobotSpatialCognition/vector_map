@@ -283,8 +283,7 @@ def la(corner, tolerance):
         denom = math.sqrt(math.pow(ay-by,2) + math.pow(ax-bx,2))
 
         d = numer / denom
-        # if d < tolerance:
-        #     applox_corner.remove(corner[i%num])
+
         if d <= tolerance:
             cp.remove((ty,tx))
             
@@ -401,9 +400,6 @@ def search_nearpoint(sorted_corner, degree_list):
 						if min(ay,by) <= intersect_y <= max(ay,by) and min(ax,bx) <= intersect_x <= max(ax,bx):
 							candidates.append((intersect_y,intersect_x))
 							
-			
-			# print(candidates)
-			# print(corner_y,corner_x)
 			if candidates != []:
 				for y,x in candidates:
 					before = np.array((before_y, before_x))
@@ -419,7 +415,6 @@ def search_nearpoint(sorted_corner, degree_list):
 				if nearest != ():
 					nodes.append((corner,nearest))
 
-				# print("------------")
 	return nodes
 
 
@@ -461,21 +456,7 @@ def make_mapbb(img):
     dy = max_vy-min_vy
     d = max(dx,dy)
     r = (np.sqrt(2)*d)//2
-    # print(f"r={r}")
     center = ((min_vx+max_vx)//2, (min_vy+max_vy)//2)
-    # print(f"center={center}")
-    # lu = (int(center[0]-r), int(center[1]-r))
-    # ru = (int(center[0]-r), int(center[1]+r))
-    # lb = (int(center[0]+r), int(center[1]-r))
-    # rb = (int(center[0]+r), int(center[1]+r)) 
-    # print(center,lu, ru, lb, rb)
-
-    # mimg = pp.drawMarkerList(img, [lu], (255,0,0))
-    # mimg = pp.drawMarkerList(mimg, [ru], (0,255,0))
-    # mimg = pp.drawMarkerList(mimg, [lb], (0,0,255))
-    # mimg = pp.drawMarkerList(mimg, [rb], (0,128,128))   
-    # pp.imshow(mimg)
-
     return center, int(r)
 
 
@@ -502,19 +483,17 @@ def rotation(img, angle = -233):
     trans = cv2.getRotationMatrix2D(center, angle , scale)
     #アフィン変換
     image2 = cv2.warpAffine(img, trans, (img.shape[0], img.shape[1]), borderValue=tc, flags=cv2.INTER_NEAREST)
-    # image2 = pp.trim(image2)
-    # pp.imshow(image2)
+
     return image2
 
 def addition_property(bin_raster):
-	raster = np.pad(bin_raster, 10, constant_values=0) ##padding 各方向に10画素ずつ
-	raster = raster.astype(np.int32) ##要素の型変更
+	
+	raster = bin_raster.astype(np.int32) ##要素の型変更
 	p_map = wall_detected1(raster) ##壁とそれ以外を分類
 	p2_map = wall_detected2(p_map,raster) ##暫定コーナーの抽出
 	p3_map = wall_detected3(p2_map, raster) ##内部と外部を塗り分け
 	p = renew_corner_func(p3_map, raster) ##暫定コーナーをコーナーにする処理
 	corner_list = get_corner_list_from_pm(p)
-	# p = p[10:p.shape[0]-10,10:p.shape[1]-10]
 	return p, corner_list
 
 def approximate_corner(tmp_property,tmp_corners):
@@ -526,7 +505,7 @@ def approximate_corner(tmp_property,tmp_corners):
 
 	sorted_corner = sort_corner(tmp_corners, sort)
 
-	reduced_corner = la(sorted_corner, 3)
+	reduced_corner = la(sorted_corner, 4)
 	reduced_corner_cv2 = []
 	for py,px in reduced_corner:
 		reduced_corner_cv2.append((px,py))
@@ -549,14 +528,15 @@ def approximate_corner(tmp_property,tmp_corners):
 	return testp, clist, dlist
 
 
+
+
 def getMovePoint(img_org):
-	# img_org = cv2.imread(pgm_array,cv2.IMREAD_GRAYSCALE) ##読み込み
+	
 	
 	img_org, offset = img_crop(img_org)
-	# cv2.imwrite("./latex_data/kenA605.png",img_org)
+
 	skeleton_map = gen_sk_map(img_org, 11) ##スケルトンマップの生成　（0,255)
-	# debug.show(skeleton_map)
-	# cv2.imwrite("./latex_data/skeletonmap2.png",skeleton_map)
+
 
 
 	##関数化済み　->addition_property()
@@ -585,14 +565,6 @@ def getMovePoint(img_org):
 		reduced_corner_cv2.append((px,py))
 
 
-	# img = mono2color(tmp_sk)
-	# debug.show(img)
-
-
-	# dot = pp.drawMarkerList(tmp_sk, reduced_corner_cv2, (0,255,0))
-	# dot_org = pp.drawMarkerList(tmp_sk, reduced_corner_cv2, (0,255,0))
-
-
 	degree_list = calc_degree(reduced_corner,p)
 	testp = p.copy()
 
@@ -602,8 +574,7 @@ def getMovePoint(img_org):
 	for point in reduced_corner:
 		testp[point]=15
 	
-	# debug.show(debug.coloring_img(testp))
-	# cv2.imwrite("/Users/wataru/MapLibrary/demo_maplibrary/demo_maplibrary/demo_maplibrary/latex_data/reduce_corner.png",debug.coloring_img(testp))
+	
 
 
 	clist, dlist  = delete_180(reduced_corner, degree_list)
@@ -612,9 +583,7 @@ def getMovePoint(img_org):
 
 	for point in clist:
 		testp[point]=15
-	# debug.show(debug.coloring_img(testp))
-	# cv2.imwrite("/Users/wataru/MapLibrary/demo_maplibrary/demo_maplibrary/demo_maplibrary/latex_data/linear_approx.png",debug.coloring_img(testp))
-	###############################
+	
 	
 	output = clist
 	
@@ -676,8 +645,6 @@ def getMovePoint(img_org):
 				thickness=2,
 				line_type=cv2.LINE_4
 				)
-	# debug.show(color_src)
-	# cv2.imwrite("./latex_data/devide_jp.png",color_src)
 
 	#########
 
