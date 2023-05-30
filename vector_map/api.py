@@ -60,6 +60,7 @@ class VectorMap:
 		return raster
 
 	def get_coord(self,p):
+		#clipの補正
 		shape = self.raster.shape
 		resolution = self.raster.resolution
 		origin = self.raster.origin
@@ -91,6 +92,13 @@ class VectorMap:
 		prop.data = self.pix_property
 		prop.scale = self.raster.scale
 		return prop
+	
+	def shapeup_raster(self):
+		self.bin_raster = np.pad(self.bin_raster, 10, constant_values=0)
+		self.offset_x += 10 * self.raster.resolution 
+		self.offset_y += 10 * self.raster.resolution 
+		## clip 補正
+
 
 	def shapeup_raster(self):
 		self.bin_raster = np.pad(self.bin_raster, 10, constant_values=0)
