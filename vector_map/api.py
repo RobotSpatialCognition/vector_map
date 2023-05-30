@@ -65,15 +65,21 @@ class VectorMap:
 		return raster
 
 	def get_coord(self,p):
+		#clipの補正
 		shape = self.raster.shape
 		resolution = self.raster.resolution
 		origin = self.raster.origin
-		base_x = -0.75 #pix * resolution
-		base_y = shape[1]*resolution - 1.1
+		# base_x = -0.75 #pix * resolution
+		# base_y = shape[1]*resolution - 1.1
+
+		base_x = self.offset_x
+		base_y = shape[1]*resolution + self.offset_y 
+
     	# further adjustment: move origin from (0, 0) to config.origin
 		base_x += origin[0]
 		base_y += origin[1]
-		return float(p[1])*resolution+base_x, -float(p[0])*resolution+base_y
+
+		return float(p[1])*resolution+base_x, -float(p[0])*resolution+base_y 
 
 	def get_corners(self):
 		# デカルト座標でoriginを原点とした座標点のリスト
@@ -90,6 +96,12 @@ class VectorMap:
 		#raster.center = self.raster ##offset分と計算した値
 		prop.scale = self.raster.scale
 		return prop
+	
+	def shapeup_raster(self):
+		self.bin_raster = np.pad(self.bin_raster, 10, constant_values=0)
+		self.offset_x += 10 * self.raster.resolution 
+		self.offset_y += 10 * self.raster.resolution 
+		## clip 
 
 
 def get_map_ROS(dir):
