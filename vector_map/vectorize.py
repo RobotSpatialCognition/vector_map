@@ -533,7 +533,7 @@ def approximate_corner(tmp_property,tmp_corners):
 def getMovePoint(img_org):
 	
 	
-	img_org, offset = img_crop(img_org)
+	img_org, _ = img_crop(img_org)
 
 	skeleton_map = gen_sk_map(img_org, 11) ##スケルトンマップの生成　（0,255)
 
@@ -663,8 +663,8 @@ def getMovePoint(img_org):
 		adjacent_matrix[label2-1, label1-1] = 1
 
 
-	center[:,0] += offset[0]
-	center[:,1] += offset[1]
+#	center[:,0] += offset[0]
+#	center[:,1] += offset[1]
 
 	center_list = []
 	for c in center:
@@ -675,8 +675,8 @@ def getMovePoint(img_org):
 	for n,c in enumerate(clist):
 		output[n][0] = c[0]
 		output[n][1] = c[1]
-	output[:,0] += offset[0]
-	output[:,1] += offset[1]
+#	output[:,0] += offset[0]
+#	output[:,1] += offset[1]
 
 
 
