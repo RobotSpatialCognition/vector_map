@@ -101,7 +101,8 @@ class VectorMap:
 		self.bin_raster = np.pad(self.bin_raster, 10, constant_values=0)
 		self.offset_x += 10 * self.raster.resolution 
 		self.offset_y += 10 * self.raster.resolution 
-		## clip 
+		## clip 補正
+
 
 
 def get_map_ROS(dir):

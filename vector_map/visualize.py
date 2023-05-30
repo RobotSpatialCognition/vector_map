@@ -74,8 +74,7 @@ class SimulationSpace:
         else:
             x = loc[0]
             y = loc[1]
-        # x -= self.origin[0] # offset origin
-        # y -= self.origin[1]
+
         pix_x = int((x - self.offset_x) * self.scale) # offset margin
         pix_y = int((-y + self.offset_y) * self.scale + self.total_y)
         pix_x -= self.origin[0]
