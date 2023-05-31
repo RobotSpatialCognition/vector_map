@@ -30,7 +30,6 @@ class SimulationSpace:
         canvas = Canvas(root, width=1000, height=1250)
         self.canvas = canvas
         self.world = region.world
-        # self.origin = region.world.map.raster.origin
         first = True
         for b in region.outer_boundary:
             l = b.segment
@@ -47,8 +46,10 @@ class SimulationSpace:
                 elif x < min_x: min_x = x
                 if y > max_y: max_y = y
                 elif y < min_y: min_y = y
-            self.offset_x = min_x + 1.5 
-            self.offset_y = min_y + 1.9 
+#            self.offset_x = min_x + 1.5 
+#            self.offset_y = min_y + 1.9 
+            self.offset_x = min_x - 0.5
+            self.offset_y = min_y + 1.5
             range_x = max_x - min_x
             range_y = max_y - min_y
             scale_x = WINDOW_X / (range_x + 1)
