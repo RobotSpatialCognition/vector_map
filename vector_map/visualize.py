@@ -30,7 +30,7 @@ class SimulationSpace:
         canvas = Canvas(root, width=1000, height=1250)
         self.canvas = canvas
         self.world = region.world
-        self.origin = region.world.map.raster.origin
+        # self.origin = region.world.map.raster.origin
         first = True
         for b in region.outer_boundary:
             l = b.segment
@@ -77,8 +77,8 @@ class SimulationSpace:
 
         pix_x = int((x - self.offset_x) * self.scale) 
         pix_y = int((-y + self.offset_y) * self.scale + self.total_y)
-        pix_x -= self.origin[0]
-        pix_y += self.origin[1]
+        # pix_x -= self.origin[0]
+        # pix_y += self.origin[1]
         return pix_x, pix_y
 
     def pix_to_coord(self, *pix):

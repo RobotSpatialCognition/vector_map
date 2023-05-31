@@ -28,7 +28,7 @@ def wall_detected1(sk_map): #0,1のマップ
 	return property_map
 
 def make_wall_list(sk_map):
-	return list(zip(*np.where(sk_map == 1)))
+	return list(zip(*np.where(sk_map != 0)))
 
 def detect_keyp(local_map):
     is_keyp = False
@@ -98,6 +98,7 @@ def get_wall_order(sk_map):
 	rotatemap = make_rotate_map(sk_map)
 	n = sk_map.shape[1]
 	ret_gtp = get_tp_points(sk_map, wall_list)
+	
 	if ret_gtp == []:
 
 		current_y,current_x = wall_list[0]
@@ -682,4 +683,3 @@ def getMovePoint(img_org):
 
 
 	return center, adjacent_matrix, center_list, output
-
