@@ -12,19 +12,40 @@ from .geometric_map import World
 
 #@dataclass
 class Raster:
-	def __init__(self, data, resolution, origin, rotation=0) -> None:
+	def __init__(self, data, resolution) -> None:
 		self.data = data
 		self.resolution = resolution
-		self.origin = origin
+		self.offset_x = 0
+		self.offset_y = 0
+		
 		self.shape = data.shape
 		self.offset_y = data.shape[1] * resolution
-		self.rotation = rotation
+		self.rotation = None
+		self.cliped_origin_x = 0
+		self.cliped_origin_y = 0
 	#data:boolの配列にすべき
 	
 	def pix_to_coord(self, pix_x, pix_y):
-		coord_x = float(pix_x)*self.resolution + self.origin[0]
-		coord_y = -float(pix_y)*self.resolution + self.offset_y + self.origin[1]
+		reverse_mat = [[np.cos(self.rotation),-1 * np.sin(self.rotation)],[np.sin(self.rotation),np.cos(self.rotation)]]
+		pix_x,pix_y = np.dot(reverse_mat,np.array(pix_x,pix_y))
+		pix_x += self.cliped_origin_x
+		pix_y += self.cliped_origin_y
+		coord_x = float(pix_x)*self.resolution + self.offset_x
+		coord_y = -float(pix_y)*self.resolution + self.offset_y + self.offset_y
 		return coord_x, coord_y
+	
+	def move(self, x, y):
+		self.offset_x += x
+		self.offset_y += y
+	
+	def rotate(self, angle):
+		self.rotate = angle
+		self.data = vectorize.rotation(self.data, self.rotate)
+
+	def clip(self):
+		self.data, (self.cliped_origin,self.cliped_origin_y) = vectorize.img_crop(self.data)
+
+
 
 class RasterProperty(Raster):
 	pass
@@ -71,35 +92,13 @@ class VectorMap:
 		origin_x += 10 * self.raster.resolution 
 		origin_y += 10 * self.raster.resolution 
 		bin_raster = Raster(bin_raster_data, resolution, [origin_x, origin_y])
-		## clip 補正
+
 		return bin_raster
 
 	def get_denoised_raster(self):
 		raster = Raster(self.denoised_raster, self.raster.resolution, self.raster.origin)
 		return raster
 
-# get_coord obsolete
-		'''
-	def get_coord(self,p):
-		#clipの補正
-		shape = self.raster.shape
-		resolution = self.raster.resolution
-		origin = self.raster.origin
-		# base_x = -0.75 #pix * resolution
-		# base_y = shape[1]*resolution - 1.1
-
-		base_x = self.offset_x
-		base_y = shape[1]*resolution + self.offset_y 
-
-    	# further adjustment: move origin from (0, 0) to config.origin
-		base_x += origin[0]
-		base_y += origin[1]
-
-		bare_x = float(p[1])*resolution
-		bare_y = float(p[0])*resolution
-	#	return float(p[1])*resolution+base_x, -float(p[0])*resolution+base_y 
-		return bare_x , bare_y
-		'''
 
 	def get_corners(self):
 		# デカルト座標でoriginを原点とした座標点のリスト
