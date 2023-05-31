@@ -30,6 +30,7 @@ class SimulationSpace:
         canvas = Canvas(root, width=1000, height=1250)
         self.canvas = canvas
         self.world = region.world
+        origin = region.world.map.get_property()['origin']
         first = True
         for b in region.outer_boundary:
             l = b.segment
@@ -48,15 +49,16 @@ class SimulationSpace:
                 elif y < min_y: min_y = y
 #            self.offset_x = min_x + 1.5 
 #            self.offset_y = min_y + 1.9 
-            self.offset_x = min_x - 0.5
-            self.offset_y = min_y + 1.5
-            range_x = max_x - min_x
-            range_y = max_y - min_y
-            scale_x = WINDOW_X / (range_x + 1)
-            scale_y = WINDOW_Y / (range_y + 1)
-            if scale_x > scale_y: self.scale = scale_y 
-            else: self.scale = scale_x
-            self.total_y = range_y * self.scale
+        print(f'min_x:{float(min_x)}, min_y:{float(min_y)}, max_x:{float(max_x)}, max_y:{float(max_y)} ')
+        self.offset_x = min_x - 0.5
+        self.offset_y = min_y + 1.5
+        range_x = max_x - min_x
+        range_y = max_y - min_y
+        scale_x = WINDOW_X / (range_x + 1)
+        scale_y = WINDOW_Y / (range_y + 1)
+        if scale_x > scale_y: self.scale = scale_y 
+        else: self.scale = scale_x
+        self.total_y = range_y * self.scale
         for b in region.outer_boundary:
             self.draw_line(b.segment)
         self.canvas.pack()
@@ -78,8 +80,6 @@ class SimulationSpace:
 
         pix_x = int((x - self.offset_x) * self.scale) 
         pix_y = int((-y + self.offset_y) * self.scale + self.total_y)
-        # pix_x -= self.origin[0]
-        # pix_y += self.origin[1]
         return pix_x, pix_y
 
     def pix_to_coord(self, *pix):
@@ -94,10 +94,8 @@ class SimulationSpace:
         else:
             x = float(pix[0])
             y = float(pix[1])
-            x -= self.origin[0] 
-            y -= self.origin[1]
-        loc_x = x / self.scale + self.offset_x #+ self.origin[0]
-        loc_y = (self.total_y - y) / self.scale + self.offset_y #+ self.origin[1]
+        loc_x = x / self.scale + self.offset_x
+        loc_y = (self.total_y - y) / self.scale + self.offset_y
         return loc_x, loc_y
     
     def draw_line(self, line:Segment, arrow=None):

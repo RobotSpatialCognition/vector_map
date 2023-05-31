@@ -30,9 +30,11 @@ class Raster:
 		pix_x,pix_y = np.dot(reverse_mat,np.array([pix_y,pix_x])) # ndarray(y, x)
 		pix_x += self.cliped_origin_x
 		pix_y += self.cliped_origin_y
-		coord_x = float(pix_x)*self.resolution + self.offset_x
+#		coord_x = float(pix_x)*self.resolution + self.offset_x
+		coord_x = float(pix_x)*self.resolution
 		height = self.data.shape[0] * self.resolution
-		coord_y = -float(pix_y)*self.resolution + height + self.offset_y
+#		coord_y = -float(pix_y)*self.resolution + height + self.offset_y
+		coord_y = -float(pix_y)*self.resolution + height
 		return coord_x, coord_y
 	
 	def move(self, x, y):
@@ -47,10 +49,6 @@ class Raster:
 		self.data, (clipped_origin_x,clipped_origin_y) = vectorize.img_crop(self.data)
 		self.offset_x += clipped_origin_x
 		self.offset_y += clipped_origin_y
-
-
-class RasterProperty(Raster):
-	pass
 	
 class PixType(Enum):
 	INNER = 2
@@ -102,11 +100,11 @@ class VectorMap:
 		print(points)
 		return points
 
-	def get_raster_property(self):
-		prop = RasterProperty()
-		prop.data = self.pix_property
-		prop.scale = self.raster.scale
-		return prop
+	def set_property(self, prop):
+		self.pix_property = prop
+
+	def get_property(self):
+		return self.pix_property
 
 def get_map_ROS(dir):
 	if dir.startswith('~'):
@@ -124,6 +122,7 @@ def get_map_ROS(dir):
 	# create VectorMap form raster object
 	raster = Raster(map_img, resolution)
 	raster.move(origin[0],origin[1])
-	vector_map = VectorMap(raster)
+	map = VectorMap(raster)
+	map.set_property(config)
 
-	return World(vector_map)
+	return World(map)
