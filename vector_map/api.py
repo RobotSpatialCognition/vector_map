@@ -13,6 +13,9 @@ from .geometric_map import World
 
 # class to keep and handle raw data of pixel data
 class Raster:
+	# Raster(data, resolution)
+	#    data: ndarray
+	#    resolution: size in meter / pixel
 	def __init__(self, data, resolution) -> None:
 		self.data = data
 		self.resolution = resolution
@@ -34,6 +37,7 @@ class Raster:
 		coord_y = -float(pix_y)*self.resolution + height + self.offset_y
 		return coord_x, coord_y
 	
+	# move the origin
 	def move(self, x, y):
 		if self.rotation:
 			self.post_offset_x += x
@@ -42,6 +46,7 @@ class Raster:
 			self.offset_x += x
 			self.offset_y += y
 	
+	# rotate the map image. The center of rotation is the center of map image
 	def rotate(self, angle):
 		if angle == 0: return
 		self.rotation = angle
@@ -49,14 +54,17 @@ class Raster:
 		self.post_offset_x = 0 # offset for post rotation
 		self.post_offset_y = 0
 
+	# cut off unnecessary parts of the map image
 	def clip(self):
 		self.data, (clipped_origin_x,clipped_origin_y) = vectorize.img_crop(self.data)
 		# adjust offset to cancel clipping effect
 		self.move(clipped_origin_x*self.resolution, clipped_origin_y*self.resolution)
 	
+	# thinning map lines
 	def denoize(self, ksize):
 		self.data = vectorize.gen_sk_map(self.data, ksize)
 	
+	# adding margin to the map perimeter
 	def pad(self):
 		self.data = np.pad(self.data, 10, constant_values=0)
 		self.move(-10 * self.resolution, -10 * self.resolution) 
@@ -93,18 +101,11 @@ class VectorMap:
 
 	# generates Cartesian coordinate of corners
 	def get_corners(self):
-		# デカルト座標でoriginを原点とした座標点のリスト
 		points = []
 		for py,px in self.corners:
 			points.append(self.bin_raster.pix_to_coord(px, py))
 		print(points)
 		return points
-
-	def set_property(self, prop):
-		self.pix_property = prop
-
-	def get_property(self):
-		return self.pix_property
 
 # generates World map from map files in ROS format
 def get_map_ROS(dir):
@@ -124,6 +125,5 @@ def get_map_ROS(dir):
 	raster = Raster(map_img, resolution)
 	raster.move(origin[0],origin[1])
 	map = VectorMap(raster)
-	map.set_property(config)
 
 	return World(map)

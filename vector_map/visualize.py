@@ -30,7 +30,6 @@ class SimulationSpace:
         canvas = Canvas(root, width=1000, height=1250)
         self.canvas = canvas
         self.world = region.world
-        origin = region.world.map.get_property()['origin']
         first = True
         for b in region.outer_boundary:
             l = b.segment
