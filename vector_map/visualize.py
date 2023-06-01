@@ -47,9 +47,7 @@ class SimulationSpace:
                 elif x < min_x: min_x = x
                 if y > max_y: max_y = y
                 elif y < min_y: min_y = y
-#            self.offset_x = min_x + 1.5 
-#            self.offset_y = min_y + 1.9 
-        print(f'min_x:{float(min_x)}, min_y:{float(min_y)}, max_x:{float(max_x)}, max_y:{float(max_y)} ')
+#        print(f'min_x:{float(min_x)}, min_y:{float(min_y)}, max_x:{float(max_x)}, max_y:{float(max_y)} ')
         self.offset_x = min_x - 0.5
         self.offset_y = min_y + 1.5
         range_x = max_x - min_x

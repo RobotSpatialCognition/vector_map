@@ -11,7 +11,7 @@ import copy
 from . import vectorize
 from .geometric_map import World
 
-#@dataclass
+# class to keep and handle raw data of pixel data
 class Raster:
 	def __init__(self, data, resolution) -> None:
 		self.data = data
@@ -20,10 +20,7 @@ class Raster:
 		self.offset_y = 0
 		
 		self.shape = data.shape
-		# self.height = data.shape[1] * resolution
 		self.rotation = None
-		self.clipped_origin_x = 0
-		self.clipped_origin_y = 0
 	#data:boolの配列にすべき
 	
 	def pix_to_coord(self, pix_x, pix_y):
@@ -31,11 +28,7 @@ class Raster:
 			#pix_x += self.clipped_origin_x
 			#pix_y += self.clipped_origin_y
 			reverse_mat = [[np.cos(self.rotation),-1 * np.sin(self.rotation)],[np.sin(self.rotation),np.cos(self.rotation)]]
-			pix_x,pix_y = np.dot(reverse_mat,np.array([pix_y,pix_x])) # ndarray(y, x)
-		else:
-			x = pix_x
-			pix_x = pix_y
-			pix_y = x
+			pix_x,pix_y = np.dot(reverse_mat,np.array([pix_x,pix_y])) # ndarray(y, x)
 		coord_x = float(pix_x)*self.resolution + self.offset_x
 		height = self.data.shape[0] * self.resolution
 		coord_y = -float(pix_y)*self.resolution + height + self.offset_y
@@ -66,8 +59,7 @@ class Raster:
 	
 	def pad(self):
 		self.data = np.pad(self.data, 10, constant_values=0)
-		self.offset_x += 10 * self.resolution 
-		self.offset_y += 10 * self.resolution 
+		self.move(-10 * self.resolution, -10 * self.resolution) 
 
 class PixType(Enum):
 	INNER = 2
@@ -75,6 +67,7 @@ class PixType(Enum):
 	WALL   = 12
 	CORNER = 15
 
+# low layer map class to handle pixel level operations
 class VectorMap:
 	def __init__(self,raster,ksize=11, epsilon=3):
 		self.raster = raster
@@ -82,7 +75,7 @@ class VectorMap:
 		# create target raster to operate: bin_raster
 		bin_raster = copy.copy(raster)
 		bin_raster.clip()
-		bin_raster.denoize(ksize) # ksize=5?
+		bin_raster.denoize(4) # ksize=5?
 		self.denoised_raster = copy.copy(bin_raster)
 		bin_raster.pad()
 		self.bin_raster = bin_raster
@@ -98,11 +91,11 @@ class VectorMap:
 	def get_denoised_raster(self):
 		return self.denoised_raster
 
+	# generates Cartesian coordinate of corners
 	def get_corners(self):
 		# デカルト座標でoriginを原点とした座標点のリスト
 		points = []
-		print(len(self.corners))
-		for px,py in self.corners:
+		for py,px in self.corners:
 			points.append(self.bin_raster.pix_to_coord(px, py))
 		print(points)
 		return points
@@ -113,6 +106,7 @@ class VectorMap:
 	def get_property(self):
 		return self.pix_property
 
+# generates World map from map files in ROS format
 def get_map_ROS(dir):
 	if dir.startswith('~'):
 		dir = os.path.expanduser(dir)

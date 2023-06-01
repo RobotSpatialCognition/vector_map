@@ -506,7 +506,8 @@ def approximate_corner(tmp_property,tmp_corners):
 
 	sorted_corner = sort_corner(tmp_corners, sort)
 
-	reduced_corner = la(sorted_corner, 4)
+#	reduced_corner = la(sorted_corner, 4)
+	reduced_corner = la(sorted_corner, 3)
 	reduced_corner_cv2 = []
 	for py,px in reduced_corner:
 		reduced_corner_cv2.append((px,py))
