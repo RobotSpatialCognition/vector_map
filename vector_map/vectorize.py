@@ -542,56 +542,57 @@ def getMovePoint(img_org):
 
 
 	##関数化済み　->addition_property()
-	tmp_sk =skeleton_map/255##(0,1)のスケルトンマップに変更
+	# tmp_sk =skeleton_map/255##(0,1)のスケルトンマップに変更
 
-	tmp_sk = np.pad(tmp_sk, 10, constant_values=0) ##padding 各方向に10画素ずつ
-	tmp_sk = tmp_sk.astype(np.int32) ##要素の型変更
-	p_map = wall_detected1(tmp_sk) ##壁とそれ以外を分類
-	p2_map = wall_detected2(p_map,tmp_sk) ##暫定コーナーの抽出
-	p3_map = wall_detected3(p2_map, tmp_sk) ##内部と外部を塗り分け
-	p = renew_corner_func(p3_map, tmp_sk) ##暫定コーナーをコーナーにする処理
-	corner_list = get_corner_list_from_pm(p)
+	# tmp_sk = np.pad(tmp_sk, 10, constant_values=0) ##padding 各方向に10画素ずつ
+	# tmp_sk = tmp_sk.astype(np.int32) ##要素の型変更
+	# p_map = wall_detected1(tmp_sk) ##壁とそれ以外を分類
+	# p2_map = wall_detected2(p_map,tmp_sk) ##暫定コーナーの抽出
+	# p3_map = wall_detected3(p2_map, tmp_sk) ##内部と外部を塗り分け
+	# p = renew_corner_func(p3_map, tmp_sk) ##暫定コーナーをコーナーにする処理
+	# corner_list = get_corner_list_from_pm(p)
 
 	###関数化済み -> approximate_corner
-
-	p[p == 1] = 19# 内部塗りつぶし
-
-
-	sort = wallsort(p)
-
-	sorted_corner = sort_corner(corner_list, sort)
-
-	reduced_corner = la(sorted_corner, 3)
-	reduced_corner_cv2 = []
-	for py,px in reduced_corner:
-		reduced_corner_cv2.append((px,py))
+	p ,corner_list = addition_property(skeleton_map)
+	testp, clist, dlist = approximate_corner(p,corner_list)
+	# p[p == 1] = 19# 内部塗りつぶし
 
 
-	degree_list = calc_degree(reduced_corner,p)
-	testp = p.copy()
+	# sort = wallsort(p)
 
-	for point in corner_list:
-		testp[point] = 12
+	# sorted_corner = sort_corner(corner_list, sort)
 
-	for point in reduced_corner:
-		testp[point]=15
+	# reduced_corner = la(sorted_corner, 3)
+	# reduced_corner_cv2 = []
+	# for py,px in reduced_corner:
+	# 	reduced_corner_cv2.append((px,py))
+
+
+	# degree_list = calc_degree(reduced_corner,p)
+	# testp = p.copy()
+
+	# for point in corner_list:
+	# 	testp[point] = 12
+
+	# for point in reduced_corner:
+	# 	testp[point]=15
 	
 	
 
 
-	clist, dlist  = delete_180(reduced_corner, degree_list)
-	for point in corner_list:
-		testp[point] = 12
+	# clist, dlist  = delete_180(reduced_corner, degree_list)
+	# for point in corner_list:
+	# 	testp[point] = 12
 
-	for point in clist:
-		testp[point]=15
+	# for point in clist:
+	# 	testp[point]=15
 	
 	
 	output = clist
 	
 	###########分割関数
 	nodes = search_nearpoint(clist, dlist)
-
+	tmp_sk = skeleton_map/255
 	img = mono2color(tmp_sk)
 	binimg = img * 255
 	for points in nodes:
@@ -683,4 +684,27 @@ def getMovePoint(img_org):
 
 
 
-	return center, adjacent_matrix, center_list, output
+	return center, adjacent_matrix, center_list, output, labelImage
+
+
+def get_subregion_points(labelImg):
+	shape = (labelImg.shape[0],labelImg.shape[0])
+	# print(shape)
+	sub_regions = {}
+	for label in range(1,labelImg.max()+1):
+		limg = np.zeros(shape)
+		limg[labelImg == label] = 255
+		limg[labelImg == 0] = 0
+		kernel = np.ones((2,2), np.uint8)
+		test_img = cv2.morphologyEx(limg, cv2.MORPH_GRADIENT, kernel)
+
+
+		subproperty_map, subcorner_list = addition_property(limg)
+		_, subclist,_ = approximate_corner(subproperty_map,subcorner_list)
+		sub_region_point = []
+		for x,y in subclist:
+			sub_region_point.append([x,y])
+		sub_regions[label] = sub_region_point
+	# print(sub_regions)
+	return sub_regions
+
