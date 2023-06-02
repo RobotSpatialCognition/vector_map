@@ -51,6 +51,37 @@ class vector_map.Boundary(start, end, order, type)
          and those that are virtually created by views. 'type' indicates
          this distinction.
 
+   distance(point)
+      returns distance from external point to this Boundary.
+      Returns:
+         float
+   
+   perpendicular_line(self, point)
+      returns a perpendicular to this Boundary through point.
+      Returns:
+         sympy.geometry.Line
+      Parameters:
+         point: sympy.geometry.Point
+
+   slope()
+      returns the angle between this Boundary and X-axis in radian.
+      Returns:
+         float
+
+   intersect(shape)
+      returns intersection with shape.
+      Returns:
+         list of sympy.geometry.Point
+      Parameters:
+         shape: sympy.geometry.Point,Line,Segment,Ray
+   
+   Properties:
+      start, end: sympy.geometry.Point
+      segment: sympy.geometry.Segment
+         The shape of this Boundary represented by geometric line segment.
+      order: int
+      type: vector_map.BoundaryType
+
 class vector_map.View(belong)
    A set of subregions contained in a Region. A subregion may be a physically independent region from the beginning, or it may be created by virtually dividing a parent region. Division is done by inserting a virtual Boundary into the parent Region. This operation is called "cut".
 
@@ -114,6 +145,9 @@ class vector_map. Region(outer, view, inner)
              View class to be registered
           name: string
              the name given to the view
+       Returns:
+          vector_map.View
+             created view instance
 
    get_view(name):
       get registered View instance.
