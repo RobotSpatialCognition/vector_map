@@ -95,6 +95,11 @@ class VectorMap:
 		for n,c in enumerate(clist):
 			self.corners[n][0] = c[0]
 			self.corners[n][1] = c[1]
+		
+		# get subregions
+		_, _, _, _, labelImage = vectorize.getMovePoint(bin_raster.data)
+		subregions = vectorize.get_subregion_points(labelImage)	
+		print(subregions)
 
 	def get_denoised_raster(self):
 		return self.denoised_raster
