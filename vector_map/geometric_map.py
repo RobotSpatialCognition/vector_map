@@ -39,10 +39,11 @@ class View:
     def get_subregions(self):
         return self.subregions
 
-class DefaultView(View):   
-    def set_subregion(self, subregion):
-        for sub_name, sub_outer in subregion:
-            sr = Region(self.belong.world, sub_outer)
+class DefaultView(View):
+    def __init__(self, belong) -> None:
+        super().__init__(belong)
+        for sub_name, sub_outer in belong.world.map.get_subregions():
+            sr = Region(belong.world, sub_outer)
             sr.name = sub_name
             self.subregions.append(sr)
         
@@ -63,8 +64,7 @@ class World:
         boundary = Boundary(last, first, ord, BoundaryType.OUTER)
         outer.append(boundary)
         root_region = Region(self, outer)
-        view = root_region.set_view(DefaultView)
-        view.set_subregion(map.get_subregion())
+        root_region.set_view(DefaultView)
         self.regions = [root_region]
         self.root_region = root_region
     
