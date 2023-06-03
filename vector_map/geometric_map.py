@@ -33,16 +33,18 @@ class Boundary:
 
 class View:
     def __init__(self, belong) -> None:
-        if belong:
-            self.belong = belong
-            self.outer_boundary = belong.outer_boundary
-            self.inner_boundaries = belong.inner_boundaries
-            self.world = belong.world
+        self.belong = belong
         self.subregions = []
-        
-    
+         
     def get_subregions(self):
         return self.subregions
+
+class DefaultView(View):   
+    def set_subregion(self, subregion):
+        for sub_name, sub_outer in subregion:
+            sr = Region(self.belong.world, sub_outer)
+            sr.name = sub_name
+            self.subregions.append(sr)
         
 class World:
     def __init__(self, map) -> None:
@@ -60,11 +62,11 @@ class World:
             ord += 1
         boundary = Boundary(last, first, ord, BoundaryType.OUTER)
         outer.append(boundary)
-        self.outer = outer
-        dummy = View(None)
-        dummy.world = self
-        self.root_region = Region(outer, dummy)
-        self.regions = [self.root_region]
+        root_region = Region(self, outer)
+        view = root_region.set_view(DefaultView)
+        view.set_subregion(map.get_subregion())
+        self.regions = [root_region]
+        self.root_region = root_region
     
     def get_root_region(self):
         return self.root_region
@@ -73,18 +75,17 @@ class World:
         return self.regions
     
 class Region:
-    def __init__(self, outer:list, view, inner=[]) -> None:
+    def __init__(self, world:World, outer:list, inner=[]) -> None:
+        self.world = world
         self.outer_boundary = outer
         self.inner_boundaries = inner
         points = []
         for b in outer:
             points.append(b.start)
-        self.outer_polygon = Polygon(*points)
         self.corner_points = points
-        self.parent_view = view
+        self.outer_polygon = Polygon(*points)
         self.views = {}
-        self.world = view.world
-        self.default_view = View(self)
+        self.default_view = None
 
     def get_circumference(self):
         return self.outer_polygon
@@ -110,9 +111,12 @@ class Region:
         if num_w == 0: return None
         return sorted(cand, key=itemgetter(0))
 
-    def set_view(self, view_class, name):
-        view = view_class(self.physical_boundaries)
-        self.views[name] = view
+    def set_view(self, view_class, name=None):
+        view = view_class(self, self)
+        if name:
+            self.views[name] = view
+        else:
+            self.default_view = view
         return view
 
     def get_view(self, name=None):
@@ -123,8 +127,8 @@ class Region:
     
     def get_subregions(self, view_name=None):
         if not view_name:
-            return self.default_view.get_subregions()
+            view = self.default_view
         else:
             view = self.views.get(view_name)
-            if not view: return None
-            return view.get_subregions()
+        if not view: return None
+        return view.get_subregions()
