@@ -100,12 +100,16 @@ class VectorMap:
 			self.corners[n][1] = c[1]
 		
 		# get subregions
-		_, _, _, _, labelImage = vectorize.getMovePoint(clip_raster.data)
-		subregions = vectorize.get_subregion_points(labelImage)	
-		print(subregions)
+#		_, _, _, _, labelImage = vectorize.getMovePoint(clip_raster.data)
+#		self.subregions = vectorize.get_subregion_points(labelImage)	
+#		print(self.subregions)
+		self.subregions = {}
 
 	def get_denoised_raster(self):
 		return self.denoised_raster
+	
+	def get_subregions(self):
+		return self.subregions
 
 	# generates Cartesian coordinate of corners
 	def get_corners(self):

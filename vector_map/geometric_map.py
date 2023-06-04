@@ -112,7 +112,7 @@ class Region:
         return sorted(cand, key=itemgetter(0))
 
     def set_view(self, view_class, name=None):
-        view = view_class(self, self)
+        view = view_class(self)
         if name:
             self.views[name] = view
         else:

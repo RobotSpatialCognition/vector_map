@@ -22,6 +22,7 @@ class SimulationSpace:
 
     def __init__(self, region:Region, window_x=WINDOW_X, window_y=WINDOW_Y):
         global root
+        self.region = region
         for widgets in root.winfo_children():
             widgets.destroy()
         self.window_x = window_x
@@ -56,11 +57,13 @@ class SimulationSpace:
         if scale_x > scale_y: self.scale = scale_y 
         else: self.scale = scale_x
         self.total_y = range_y * self.scale
-        for b in region.outer_boundary:
-            self.draw_line(b.segment)
         self.canvas.pack()
         self.callback = {}
         self.mouse = MouseDriver(self)
+    
+    def show_outer_boundary(self):
+        for b in self.region.outer_boundary:
+            self.draw_line(b.segment)
     
     def coord_to_pix(self, *loc):
         if len(loc) == 1:
