@@ -62,8 +62,7 @@ class SimulationSpace:
         self.mouse = MouseDriver(self)
     
     def show_outer_boundary(self):
-        for b in self.region.outer_boundary:
-            self.draw_line(b.segment)
+        self.draw_polygon(self.region.outer_polygon)
         
     def show_subregions(self):
         for sr in self.region.get_subregions().values():
@@ -117,7 +116,7 @@ class SimulationSpace:
             x, y = self.coord_to_pix(p)
             arg.append(x)
             arg.append(y)
-        self.canvas.create_polygon(*arg)
+        self.canvas.create_polygon(*arg, fill="", outline="black")
 
     def start_mouse(self):
         self.mouse = MouseDriver(self)
