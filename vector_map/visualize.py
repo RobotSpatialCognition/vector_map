@@ -64,6 +64,10 @@ class SimulationSpace:
     def show_outer_boundary(self):
         for b in self.region.outer_boundary:
             self.draw_line(b.segment)
+        
+    def show_subregions(self):
+        for sr in self.region.get_subregions().values():
+            self.draw_polygon(sr.outer_polygon)
     
     def coord_to_pix(self, *loc):
         if len(loc) == 1:
@@ -106,6 +110,14 @@ class SimulationSpace:
             elif arrow == "last": arrow = LAST
             else: arrow = None
         self.canvas.create_line(x1, y1, x2, y2, arrow=arrow)
+    
+    def draw_polygon(self, polygon):
+        arg = []
+        for p in polygon.vertices:
+            x, y = self.coord_to_pix(p)
+            arg.append(x)
+            arg.append(y)
+        self.canvas.create_polygon(*arg)
 
     def start_mouse(self):
         self.mouse = MouseDriver(self)
