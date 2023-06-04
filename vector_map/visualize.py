@@ -65,8 +65,9 @@ class SimulationSpace:
         self.draw_polygon(self.region.outer_polygon)
         
     def show_subregions(self):
-        for sr in self.region.get_subregions():
-            self.draw_polygon(sr.outer_polygon)
+        colors = ['black', 'red', 'green', 'blue', 'cyan', 'yellow', 'magenta']
+        for i, sr in enumerate(self.region.get_subregions()):
+            self.draw_polygon(sr.outer_polygon, fill=colors[i % len(colors)])
     
     def coord_to_pix(self, *loc):
         if len(loc) == 1:
@@ -110,13 +111,13 @@ class SimulationSpace:
             else: arrow = None
         self.canvas.create_line(x1, y1, x2, y2, arrow=arrow)
     
-    def draw_polygon(self, polygon):
+    def draw_polygon(self, polygon, fill="", outline="black"):
         arg = []
         for p in polygon.vertices:
             x, y = self.coord_to_pix(p)
             arg.append(x)
             arg.append(y)
-        self.canvas.create_polygon(*arg, fill="", outline="black")
+        self.canvas.create_polygon(*arg, fill=fill, outline=outline)
 
     def start_mouse(self):
         self.mouse = MouseDriver(self)

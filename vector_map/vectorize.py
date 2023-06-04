@@ -513,9 +513,9 @@ def approximate_corner(tmp_property,tmp_corners):
 	reduced_corner_cv2 = []
 	for py,px in reduced_corner:
 		reduced_corner_cv2.append((px,py))
-	degree_list = calc_degree(reduced_corner,tmp_property)
+	degree_list = calc_degree(reduced_corner,cp_property)
 	
-	testp = tmp_property.copy()
+	testp = cp_property.copy()
 	for point in tmp_corners:
 		testp[point] = 12
 
@@ -542,7 +542,8 @@ def getMovePoint(img_org):
 
 	skeleton_map = gen_sk_map(img_org, 11) ##スケルトンマップの生成　（0,255)
 	print(img_org.shape)
-	skeleton_map =np.pad(skeleton_map, 10, constant_values=0)
+	tmp_map = skeleton_map / 255
+	skeleton_map =np.pad(tmp_map, 10, constant_values=0)
 
 	##関数化済み　->addition_property()
 	# tmp_sk =skeleton_map/255##(0,1)のスケルトンマップに変更
