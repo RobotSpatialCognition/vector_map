@@ -7,7 +7,7 @@ import os
 import cv2
 import yaml
 import copy
-import matplotlib.pyplot as plt
+
 
 from . import vectorize
 from .geometric_map import World

@@ -1,9 +1,9 @@
 import cv2
 import numpy as np
-import matplotlib.pyplot as plt
+
 import math
 import random
-np.set_printoptions(threshold=np.inf)
+
 
 tp = [(-1,0),(0,1),(1,0),(0,-1),(-1,1), (1,1), (1,-1),(-1,-1) ]
 til_list = [(-1,-1),(-1,1),(1,-1),(1,1)]
@@ -54,10 +54,10 @@ def get_corner_list(wall_list, sk_map):
 	return corner_list
 
 def wall_detected2(property_map,sk_map):
-	# print(sk_map)#0,1のマップ #cornerのラベル貼り
+#0,1のマップ #cornerのラベル貼り
 	wall_list = make_wall_list(sk_map)
 	corner_list = get_corner_list(wall_list, sk_map)
-	# print(corner_list)
+
 	y_len,x_len = property_map.shape
 	c = 0
 	for x in range(x_len):
@@ -172,7 +172,7 @@ def renew_corner_func(property_map,sk_map):
 						break
 		if renew_flag == False:
 			cp_property[ty,tx] = 11
-	# print(new_corner)
+
 	for corner in new_corner:
 		cp_property[corner] = 11
 	cp_property[cp_property==10] = 12
@@ -408,7 +408,7 @@ def search_nearpoint(sorted_corner, degree_list):
 					before = np.array((before_y, before_x))
 					corner = np.array((corner_y,corner_x))
 					point = np.array((y,x))
-					# print(before,corner)
+		
 					e1 = unit_vector(before,corner)
 					e2 = unit_vector(corner,point)
 					dist = np.linalg.norm(point-corner)
@@ -449,7 +449,7 @@ def mono2color(mono_img):
 
 def make_mapbb(img):
     # boundingboxの中心位置(y,x)と回転時に余裕のあるサイズを返す
-	print(img)
+
 	vy, vx = np.where(img==0)
 	max_vx = vx.max()
 	max_vy = vy.max()
@@ -465,7 +465,7 @@ def make_mapbb(img):
 
 def img_crop(img):
 	center ,r = make_mapbb(img)
-	# print(center,r)
+
 	if 2*r < img.shape[0] and 2*r < img.shape[1]:
 		img = img[center[1]-r:center[1]+r, center[0]-r:center[0]+r]
 		return img,(center[1]-r, center[0]-r) 
@@ -536,12 +536,14 @@ def approximate_corner(tmp_property,tmp_corners):
 
 def getMovePoint(img_org):
 
-	print(img_org.shape)
+	
 	
 	img_org, _ = img_crop(img_org)
 
-	skeleton_map = gen_sk_map(img_org, 11) ##スケルトンマップの生成　（0,255)
-	print(img_org.shape)
+	# skeleton_map = gen_sk_map(img_org, 11) ##スケルトンマップの生成　（0,255)
+	skeleton_map = gen_sk_map(img_org, 2) ##スケルトンマップの生成　（0,255)
+
+
 	tmp_map = skeleton_map / 255
 	skeleton_map =np.pad(tmp_map, 10, constant_values=0)
 
@@ -612,11 +614,11 @@ def getMovePoint(img_org):
 	reverse_bin = cv2.erode(reverse, kernel, iterations=1)
 	reverse_bin[testp != 19] = 0
 	label = cv2.connectedComponentsWithStats(reverse_bin)
-	print(label)
+
 
 	n = label[0] -1
 	labelImage = label[1]
-	print(f"labelImage{labelImage.max()}")
+	
 	data = np.delete(label[2], 0, 0)
 	center = np.delete(label[3], 0, 0)
 
@@ -694,8 +696,8 @@ def getMovePoint(img_org):
 
 
 def get_subregion_points(labelImg):
-	shape = (labelImg.shape[0],labelImg.shape[0])
-	print(labelImg.max())
+	shape = (labelImg.shape[0],labelImg.shape[1])
+
 	sub_regions = {}
 	for label in range(1,labelImg.max()+1):
 		limg = np.zeros(shape)
@@ -704,12 +706,12 @@ def get_subregion_points(labelImg):
 		kernel = np.ones((2,2), np.uint8)
 		test_img = cv2.morphologyEx(limg, cv2.MORPH_GRADIENT, kernel)
 		subproperty_map, subcorner_list = addition_property(test_img)
-		print(subcorner_list)
+
 		_, subclist,_ = approximate_corner(subproperty_map,subcorner_list)
 		sub_region_point = []
-		print(F"sublist{subclist}")
+	
 		for x,y in subclist:
-			print(f"point{x,y}")
+			
 			sub_region_point.append([x,y])
 		sub_regions[label] = sub_region_point
 
