@@ -7,6 +7,7 @@ import os
 import cv2
 import yaml
 import copy
+import matplotlib.pyplot as plt
 
 from . import vectorize
 from .geometric_map import World
@@ -82,7 +83,9 @@ class VectorMap:
 
 		# create target raster to operate: bin_raster
 		bin_raster = copy.copy(raster)
+		clip_raster =copy.copy(raster)
 		bin_raster.clip()
+
 		bin_raster.denoize(4) # ksize=5?
 		self.denoised_raster = copy.copy(bin_raster)
 		bin_raster.pad()
@@ -97,8 +100,9 @@ class VectorMap:
 			self.corners[n][1] = c[1]
 		
 		# get subregions
-		_, _, _, _, labelImage = vectorize.getMovePoint(raster.data)
-		self.subregions = vectorize.get_subregion_points(labelImage)
+		_, _, _, _, labelImage = vectorize.getMovePoint(clip_raster.data)
+		subregions = vectorize.get_subregion_points(labelImage)	
+		print(subregions)
 
 	def get_denoised_raster(self):
 		return self.denoised_raster
@@ -110,10 +114,6 @@ class VectorMap:
 			points.append(self.bin_raster.pix_to_coord(px, py))
 		print(points)
 		return points
-	
-	# return dictionary of subregions
-	def get_subregions(self):
-		return self.subregions
 
 # generates World map from map files in ROS format
 def get_map_ROS(dir):

@@ -1,8 +1,9 @@
 import cv2
 import numpy as np
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 import math
 import random
+np.set_printoptions(threshold=np.inf)
 
 tp = [(-1,0),(0,1),(1,0),(0,-1),(-1,1), (1,1), (1,-1),(-1,-1) ]
 til_list = [(-1,-1),(-1,1),(1,-1),(1,1)]
@@ -185,6 +186,7 @@ def get_corner_list(wall_list, sk_map):
 		local_map = np.empty((3,3))
 		for k in range(-1,2):
 			for l in range(-1,2):
+
 				local_map[k+1][l+1]=sk_map[x+k][y+l]
 		if detect_keyp(local_map):
 			corner_list.append((x,y))
@@ -406,7 +408,7 @@ def search_nearpoint(sorted_corner, degree_list):
 					before = np.array((before_y, before_x))
 					corner = np.array((corner_y,corner_x))
 					point = np.array((y,x))
-					
+					# print(before,corner)
 					e1 = unit_vector(before,corner)
 					e2 = unit_vector(corner,point)
 					dist = np.linalg.norm(point-corner)
@@ -447,18 +449,18 @@ def mono2color(mono_img):
 
 def make_mapbb(img):
     # boundingboxの中心位置(y,x)と回転時に余裕のあるサイズを返す
-
-    vy, vx = np.where(img==0)
-    max_vx = vx.max()
-    max_vy = vy.max()
-    min_vx = vx.min()
-    min_vy = vy.min()
-    dx = max_vx-min_vx
-    dy = max_vy-min_vy
-    d = max(dx,dy)
-    r = (np.sqrt(2)*d)//2
-    center = ((min_vx+max_vx)//2, (min_vy+max_vy)//2)
-    return center, int(r)
+	print(img)
+	vy, vx = np.where(img==0)
+	max_vx = vx.max()
+	max_vy = vy.max()
+	min_vx = vx.min()
+	min_vy = vy.min()
+	dx = max_vx-min_vx
+	dy = max_vy-min_vy
+	d = max(dx,dy)
+	r = (np.sqrt(2)*d)//2
+	center = ((min_vx+max_vx)//2, (min_vy+max_vy)//2)
+	return center, int(r)
 
 
 def img_crop(img):
@@ -533,13 +535,14 @@ def approximate_corner(tmp_property,tmp_corners):
 
 
 def getMovePoint(img_org):
-	
+
+	print(img_org.shape)
 	
 	img_org, _ = img_crop(img_org)
 
 	skeleton_map = gen_sk_map(img_org, 11) ##スケルトンマップの生成　（0,255)
-
-
+	print(img_org.shape)
+	skeleton_map =np.pad(skeleton_map, 10, constant_values=0)
 
 	##関数化済み　->addition_property()
 	# tmp_sk =skeleton_map/255##(0,1)のスケルトンマップに変更
@@ -608,9 +611,11 @@ def getMovePoint(img_org):
 	reverse_bin = cv2.erode(reverse, kernel, iterations=1)
 	reverse_bin[testp != 19] = 0
 	label = cv2.connectedComponentsWithStats(reverse_bin)
+	print(label)
 
 	n = label[0] -1
 	labelImage = label[1]
+	print(f"labelImage{labelImage.max()}")
 	data = np.delete(label[2], 0, 0)
 	center = np.delete(label[3], 0, 0)
 
@@ -654,16 +659,16 @@ def getMovePoint(img_org):
 
 	#隣接行列作成
 	adjacent_matrix = np.zeros((n,n),dtype="uint8")
-	for node in nodes:
-		py, px = node[0]
-		ty, tx = node[1]
-		vec1, vec2 = unit_normal_vectors(px,py,tx,ty)
-		y, x = calc_half(px,py,tx,ty)
+	# for node in nodes:
+	# 	py, px = node[0]
+	# 	ty, tx = node[1]
+	# 	vec1, vec2 = unit_normal_vectors(px,py,tx,ty)
+	# 	y, x = calc_half(px,py,tx,ty)
 
-		label1 = labelImage[int(y + 5 * vec1[1]),int(x + 5 * vec1[0])]
-		label2 = labelImage[int(y + 5 * vec2[1]),int(x + 5 * vec2[0])]
-		adjacent_matrix[label1-1, label2-1] = 1
-		adjacent_matrix[label2-1, label1-1] = 1
+	# 	label1 = labelImage[int(y + 5 * vec1[1]),int(x + 5 * vec1[0])]
+	# 	label2 = labelImage[int(y + 5 * vec2[1]),int(x + 5 * vec2[0])]
+	# 	adjacent_matrix[label1-1, label2-1] = 1
+	# 	adjacent_matrix[label2-1, label1-1] = 1
 
 
 #	center[:,0] += offset[0]
@@ -689,7 +694,7 @@ def getMovePoint(img_org):
 
 def get_subregion_points(labelImg):
 	shape = (labelImg.shape[0],labelImg.shape[0])
-	# print(shape)
+	print(labelImg.max())
 	sub_regions = {}
 	for label in range(1,labelImg.max()+1):
 		limg = np.zeros(shape)
@@ -697,14 +702,15 @@ def get_subregion_points(labelImg):
 		limg[labelImg == 0] = 0
 		kernel = np.ones((2,2), np.uint8)
 		test_img = cv2.morphologyEx(limg, cv2.MORPH_GRADIENT, kernel)
-
-
-		subproperty_map, subcorner_list = addition_property(limg)
+		subproperty_map, subcorner_list = addition_property(test_img)
+		print(subcorner_list)
 		_, subclist,_ = approximate_corner(subproperty_map,subcorner_list)
 		sub_region_point = []
+		print(F"sublist{subclist}")
 		for x,y in subclist:
+			print(f"point{x,y}")
 			sub_region_point.append([x,y])
 		sub_regions[label] = sub_region_point
-	# print(sub_regions)
+
 	return sub_regions
 
