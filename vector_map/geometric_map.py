@@ -42,7 +42,8 @@ class View:
 class DefaultView(View):
     def __init__(self, belong) -> None:
         super().__init__(belong)
-        for sub_name, sub_outer_coord in belong.world.map.get_subregions().items():
+        s = belong.world.map.get_subregions()
+        for sub_outer_coord in belong.world.map.get_subregions():
             sub_outer = []
             last = sub_outer_coord.pop(0)
             ord = 0
@@ -55,7 +56,6 @@ class DefaultView(View):
             boundary = Boundary(last, first, ord, BoundaryType.OUTER)
             sub_outer.append(boundary)
             sr = Region(belong.world, sub_outer)
-            sr.name = sub_name
             self.subregions.append(sr)
         
 class World:

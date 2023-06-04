@@ -83,7 +83,6 @@ class VectorMap:
 
 		# create target raster to operate: bin_raster
 		bin_raster = copy.copy(raster)
-		clip_raster =copy.copy(raster)
 		bin_raster.clip()
 
 		bin_raster.denoize(4) # ksize=5?
@@ -100,20 +99,28 @@ class VectorMap:
 			self.corners[n][1] = c[1]
 		
 		# get subregions
+		clip_raster =copy.copy(raster)
 		_, _, _, _, labelImage = vectorize.getMovePoint(clip_raster.data)
 		self.subregions = vectorize.get_subregion_points(labelImage)	
-		print(self.subregions)
+#		print(self.subregions)
 
 	def get_denoised_raster(self):
 		return self.denoised_raster
 	
 	def get_subregions(self):
-		return self.subregions
+		subregions = []
+		for sr in self.subregions.values():
+			subregions.append(self.conv_polygon(sr))
+		return subregions
 
 	# generates Cartesian coordinate of corners
 	def get_corners(self):
+		return self.conv_polygon(self.corners)
+	
+	# pix->coordinate conversion of point list
+	def conv_polygon(self, pix_list):
 		points = []
-		for py,px in self.corners:
+		for py,px in pix_list:
 			points.append(self.bin_raster.pix_to_coord(px, py))
 		return points
 
