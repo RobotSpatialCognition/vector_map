@@ -65,7 +65,7 @@ class SimulationSpace:
         self.draw_polygon(self.region.outer_polygon)
         
     def show_subregions(self):
-        for sr in self.region.get_subregions().values():
+        for sr in self.region.get_subregions():
             self.draw_polygon(sr.outer_polygon)
     
     def coord_to_pix(self, *loc):
