@@ -97,9 +97,8 @@ class VectorMap:
 			self.corners[n][1] = c[1]
 		
 		# get subregions
-		_, _, _, _, labelImage = vectorize.getMovePoint(bin_raster.data)
-		subregions = vectorize.get_subregion_points(labelImage)	
-		print(subregions)
+		_, _, _, _, labelImage = vectorize.getMovePoint(raster.data)
+		self.subregions = vectorize.get_subregion_points(labelImage)
 
 	def get_denoised_raster(self):
 		return self.denoised_raster
@@ -111,6 +110,10 @@ class VectorMap:
 			points.append(self.bin_raster.pix_to_coord(px, py))
 		print(points)
 		return points
+	
+	# return dictionary of subregions
+	def get_subregions(self):
+		return self.subregions
 
 # generates World map from map files in ROS format
 def get_map_ROS(dir):
