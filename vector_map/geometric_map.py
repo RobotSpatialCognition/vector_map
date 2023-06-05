@@ -113,11 +113,12 @@ class Region:
     def get_near_boundaries(self, point:Point, thresh=1):
         cand = []
         boundaries = [self.outer_boundary] + self.inner_boundaries
-        for b in boundaries:
-            if b.type != BoundaryType.INNER and b.type != BoundaryType.OUTER: continue
-            dl = float(b.distance(point))
-            if dl > thresh: continue
-            cand.append((dl, b))
+        for bl in boundaries:
+            for b in bl:
+                if b.type != BoundaryType.INNER and b.type != BoundaryType.OUTER: continue
+                dl = float(b.distance(point))
+                if dl > thresh: continue
+                cand.append((dl, b))
         num_w = len(cand)
         if num_w == 0: return None
         return sorted(cand, key=itemgetter(0))
