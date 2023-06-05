@@ -102,7 +102,7 @@ class Region:
         return self.outer_polygon
 
     def get_weight_center(self):
-        return self.outer_polygon.center
+        return self.outer_polygon.centroid
 
     def get_corner_points(self):
         return self.corner_points
