@@ -135,9 +135,10 @@ def get_map_ROS(dir):
     # read meta data
 	with open(meta_file, 'r') as yml:
 		config = yaml.safe_load(yml)
-	resolution = float(config['resolution'])
-	origin = config['origin']
+	
+	return get_map(map_img, float(config['resolution']), config['origin'])
 
+def get_map(map_img, resolution, origin):
 	# create VectorMap form raster object
 	raster = Raster(map_img, resolution)
 	raster.move(origin[0],origin[1])
