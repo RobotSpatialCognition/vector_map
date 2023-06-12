@@ -83,17 +83,25 @@ class vector_map.Boundary(start, end, order, type)
       type: vector_map.BoundaryType
 
 class vector_map.View(belong)
-   A set of subregions contained in a Region. A subregion may be a physically independent region from the beginning, or it may be created by virtually dividing a parent region. Division is done by inserting a virtual Boundary into the parent Region. This operation is called "cut".
+   A set of Subregions contained in a Region. A Subregion may be a physically
+   independent region from the beginning, or it may be created by virtually
+   dividing a parent region. Division is done by inserting a virtual Boundary
+   into the parent Region. This operation is called "cut".
 
-   The cut operation is not unique, so multiple views can be set for a single parent Region. Each View must divide the entire region of the parent Region into any subregion, and no partial region corresponding to the subregion must be generated. Also, Boundaries owned by the parent Region must be dispatched to one of subregions without duplication.
+   The cut operation is not unique, so multiple views can be set for a single
+   parent Region. Each View must divide the entire region of the parent
+   Region into any Subregion, and no partial region corresponding to the
+   Subregion must be generated. Also, Boundaries owned by the parent Region
+   must be dispatched to one of Subregions without duplication.
 
-   The View class does not include the cut operation algorithm, so it must be created in a class that inherits the View class.
+   The View class does not include the cut operation algorithm, so it must be
+   created in a class that inherits the View class.
    Parameters:
       belong: vector_map.Region
          the parent Region to which this View belongs
 
    get_subregions()
-      returns the subregions of this View in list format.
+      returns the Subregions of this View in list format.
       Returns:
          list of vector_map.Region
 
@@ -158,8 +166,8 @@ class vector_map. Region(outer, view, inner)
          View instance
 
    get_subregions(view_name):
-      get the list of subregions that the registered View has.
-      If the name is omitted, the subregion of the default View.
+      get the list of Subregions that the registered View has.
+      If the name is omitted, the Subregion of the default View.
       Parameters:
          view_name: string
       Returns:
