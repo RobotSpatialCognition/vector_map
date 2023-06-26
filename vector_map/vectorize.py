@@ -5,6 +5,7 @@ import math
 import random
 
 
+
 tp = [(-1,0),(0,1),(1,0),(0,-1),(-1,1), (1,1), (1,-1),(-1,-1) ]
 til_list = [(-1,-1),(-1,1),(1,-1),(1,1)]
 
@@ -275,22 +276,37 @@ def sort_corner(corner,sortwall):  ##真のコーナーに対してのコーナ�
 	return sort
 
 
-def la(corner, tolerance):
-    cp = corner
-    for i in range(len(corner)):
-        ty, tx = cp[i%len(corner)]
-        by, bx = cp[(i-1)%len(corner)]
-        ay, ax = cp[(i+1)%len(corner)]
+# def la(corner, tolerance):
+#     cp = corner
+#     for i in range(len(corner)):
+#         ty, tx = cp[i%len(corner)]
+#         by, bx = cp[(i-1)%len(corner)]
+#         ay, ax = cp[(i+1)%len(corner)]
 
-        numer = math.fabs((ay-by)*tx - (ax-bx)*ty + ax*by - ay*bx)
-        denom = math.sqrt(math.pow(ay-by,2) + math.pow(ax-bx,2))
+#         numer = math.fabs((ay-by)*tx - (ax-bx)*ty + ax*by - ay*bx)
+#         denom = math.sqrt(math.pow(ay-by,2) + math.pow(ax-bx,2))
 
-        d = numer / denom
+#         d = numer / denom
 
-        if d <= tolerance:
-            cp.remove((ty,tx))
+#         if d <= tolerance:
+#             cp.remove((ty,tx))
             
-    return cp
+#     return cp
+def la(corner, tolerance):
+	cp = corner
+	for i in range(len(corner)):
+		ty,tx = cp[i%len(corner)]
+		by,bx = cp[(i-1)%len(corner)]
+		ay,ax = cp[(i+1)%len(corner)]
+		numer = math.fabs((ay-by)*tx - (ax-bx)*ty + (ax * by) - (ay * bx))
+		denom = math.sqrt(math.pow((ay-by),2)+ math.pow((ax-bx),2))
+		try:
+			d = numer / denom
+		except ZeroDivisionError:
+			d = 0
+		if d <= tolerance:
+			cp.remove((ty,tx))
+	return cp
 
 
 def calc_degree(cornerlist, propertymap):
@@ -492,6 +508,7 @@ def rotation(img, angle = -233):
 def addition_property(bin_raster):
 	
 	raster = bin_raster.astype(np.int32) ##要素の型変更
+	raster = raster/255
 	p_map = wall_detected1(raster) ##壁とそれ以外を分類
 	p2_map = wall_detected2(p_map,raster) ##暫定コーナーの抽出
 	p3_map = wall_detected3(p2_map, raster) ##内部と外部を塗り分け
@@ -509,7 +526,7 @@ def approximate_corner(tmp_property,tmp_corners):
 	sorted_corner = sort_corner(tmp_corners, sort)
 
 #	reduced_corner = la(sorted_corner, 4)
-	reduced_corner = la(sorted_corner, 3)
+	reduced_corner = la(sorted_corner, 2)
 	reduced_corner_cv2 = []
 	for py,px in reduced_corner:
 		reduced_corner_cv2.append((px,py))
@@ -521,6 +538,7 @@ def approximate_corner(tmp_property,tmp_corners):
 
 	for point in reduced_corner:
 		testp[point]=15
+
 	
 	clist, dlist  = delete_180(reduced_corner, degree_list)
 	for point in tmp_corners:
@@ -528,7 +546,7 @@ def approximate_corner(tmp_property,tmp_corners):
 
 	for point in clist:
 		testp[point]=15
-
+	
 	return testp, clist, dlist
 
 
@@ -541,7 +559,7 @@ def getMovePoint(img_org):
 	img_org, _ = img_crop(img_org)
 
 	# skeleton_map = gen_sk_map(img_org, 11) ##スケルトンマップの生成　（0,255)
-	skeleton_map = gen_sk_map(img_org, 2) ##スケルトンマップの生成　（0,255)
+	skeleton_map = gen_sk_map(img_org, 5) ##スケルトンマップの生成　（0,255)
 
 
 	tmp_map = skeleton_map / 255

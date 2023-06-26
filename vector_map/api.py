@@ -78,7 +78,7 @@ class PixType(Enum):
 
 # low layer map class to handle pixel level operations
 class VectorMap:
-	def __init__(self,raster,ksize=11, epsilon=3):
+	def __init__(self,raster,ksize=5, epsilon=3):
 		self.raster = raster
 
 		# create target raster to operate: bin_raster
