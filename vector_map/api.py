@@ -78,7 +78,7 @@ class PixType(Enum):
 
 # low layer map class to handle pixel level operations
 class VectorMap:
-	def __init__(self,raster,ksize=11, epsilon=3):
+	def __init__(self,raster,ksize=5, epsilon=3):
 		self.raster = raster
 
 		# create target raster to operate: bin_raster
@@ -101,8 +101,9 @@ class VectorMap:
 		# get subregions
 		clip_raster =copy.copy(raster)
 		_, _, _, _, labelImage = vectorize.getMovePoint(clip_raster.data)
+	
 		self.subregions = vectorize.get_subregion_points(labelImage)	
-#		print(self.subregions)
+		# print(self.subregions)
 
 	def get_denoised_raster(self):
 		return self.denoised_raster

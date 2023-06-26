@@ -5,6 +5,7 @@ import math
 import random
 
 
+
 tp = [(-1,0),(0,1),(1,0),(0,-1),(-1,1), (1,1), (1,-1),(-1,-1) ]
 til_list = [(-1,-1),(-1,1),(1,-1),(1,1)]
 
@@ -275,22 +276,37 @@ def sort_corner(corner,sortwall):  ##真のコーナーに対してのコーナ�
 	return sort
 
 
-def la(corner, tolerance):
-    cp = corner
-    for i in range(len(corner)):
-        ty, tx = cp[i%len(corner)]
-        by, bx = cp[(i-1)%len(corner)]
-        ay, ax = cp[(i+1)%len(corner)]
+# def la(corner, tolerance):
+#     cp = corner
+#     for i in range(len(corner)):
+#         ty, tx = cp[i%len(corner)]
+#         by, bx = cp[(i-1)%len(corner)]
+#         ay, ax = cp[(i+1)%len(corner)]
 
-        numer = math.fabs((ay-by)*tx - (ax-bx)*ty + ax*by - ay*bx)
-        denom = math.sqrt(math.pow(ay-by,2) + math.pow(ax-bx,2))
+#         numer = math.fabs((ay-by)*tx - (ax-bx)*ty + ax*by - ay*bx)
+#         denom = math.sqrt(math.pow(ay-by,2) + math.pow(ax-bx,2))
 
-        d = numer / denom
+#         d = numer / denom
 
-        if d <= tolerance:
-            cp.remove((ty,tx))
+#         if d <= tolerance:
+#             cp.remove((ty,tx))
             
-    return cp
+#     return cp
+def la(corner, tolerance):
+	cp = corner
+	for i in range(len(corner)):
+		ty,tx = cp[i%len(corner)]
+		by,bx = cp[(i-1)%len(corner)]
+		ay,ax = cp[(i+1)%len(corner)]
+		numer = math.fabs((ay-by)*tx - (ax-bx)*ty + (ax * by) - (ay * bx))
+		denom = math.sqrt(math.pow((ay-by),2)+ math.pow((ax-bx),2))
+		try:
+			d = numer / denom
+		except ZeroDivisionError:
+			d = tolerance + 1
+		if d <= tolerance:
+			cp.remove((ty,tx))
+	return cp
 
 
 def calc_degree(cornerlist, propertymap):
@@ -492,6 +508,7 @@ def rotation(img, angle = -233):
 def addition_property(bin_raster):
 	
 	raster = bin_raster.astype(np.int32) ##要素の型変更
+	raster = raster/255
 	p_map = wall_detected1(raster) ##壁とそれ以外を分類
 	p2_map = wall_detected2(p_map,raster) ##暫定コーナーの抽出
 	p3_map = wall_detected3(p2_map, raster) ##内部と外部を塗り分け
@@ -499,7 +516,7 @@ def addition_property(bin_raster):
 	corner_list = get_corner_list_from_pm(p)
 	return p, corner_list
 
-def approximate_corner(tmp_property,tmp_corners):
+def approximate_corner(tmp_property,tmp_corners, d = 2):
 	cp_property = tmp_property.copy()
 	cp_property[cp_property == 1] = 19# 内部塗りつぶし
 
@@ -509,7 +526,7 @@ def approximate_corner(tmp_property,tmp_corners):
 	sorted_corner = sort_corner(tmp_corners, sort)
 
 #	reduced_corner = la(sorted_corner, 4)
-	reduced_corner = la(sorted_corner, 3)
+	reduced_corner = la(sorted_corner, d)
 	reduced_corner_cv2 = []
 	for py,px in reduced_corner:
 		reduced_corner_cv2.append((px,py))
@@ -521,6 +538,7 @@ def approximate_corner(tmp_property,tmp_corners):
 
 	for point in reduced_corner:
 		testp[point]=15
+
 	
 	clist, dlist  = delete_180(reduced_corner, degree_list)
 	for point in tmp_corners:
@@ -528,7 +546,7 @@ def approximate_corner(tmp_property,tmp_corners):
 
 	for point in clist:
 		testp[point]=15
-
+	
 	return testp, clist, dlist
 
 
@@ -541,11 +559,11 @@ def getMovePoint(img_org):
 	img_org, _ = img_crop(img_org)
 
 	# skeleton_map = gen_sk_map(img_org, 11) ##スケルトンマップの生成　（0,255)
-	skeleton_map = gen_sk_map(img_org, 2) ##スケルトンマップの生成　（0,255)
+	skeleton_map = gen_sk_map(img_org, 4) ##スケルトンマップの生成　（0,255)
 
 
-	tmp_map = skeleton_map / 255
-	skeleton_map =np.pad(tmp_map, 10, constant_values=0)
+	# tmp_map = skeleton_map / 255
+	skeleton_map =np.pad(skeleton_map, 10, constant_values=0)
 
 	##関数化済み　->addition_property()
 	# tmp_sk =skeleton_map/255##(0,1)のスケルトンマップに変更
@@ -695,25 +713,59 @@ def getMovePoint(img_org):
 	return center, adjacent_matrix, center_list, output, labelImage
 
 
-def get_subregion_points(labelImg):
-	shape = (labelImg.shape[0],labelImg.shape[1])
+# def get_subregion_points(labelImg, kernel = 3 , d = 4):
+# 	shape = (labelImg.shape[0],labelImg.shape[1])
 
+# 	sub_regions = {}
+# 	for label in range(1,labelImg.max()+1):
+# 		limg = np.zeros(shape)
+# 		limg[labelImg == label] = 255
+# 		limg[labelImg == 0] = 0
+# 		kernel = np.ones((2,2), np.uint8)
+# 		test_img = cv2.morphologyEx(limg, cv2.MORPH_GRADIENT, kernel)
+# 		subproperty_map, subcorner_list = addition_property(test_img)
+
+# 		_, subclist,_ = approximate_corner(subproperty_map,subcorner_list,d)
+# 		sub_region_point = []
+	
+# 		for x,y in subclist:
+			
+# 			sub_region_point.append([x,y])
+# 		sub_regions[label] = sub_region_point
+
+# 	return sub_regions
+
+def get_subregion_points(labelImg , kernel= 7):
+	shape = (labelImg.shape[0],labelImg.shape[1])
+	# print(shape)
 	sub_regions = {}
 	for label in range(1,labelImg.max()+1):
 		limg = np.zeros(shape)
 		limg[labelImg == label] = 255
-		limg[labelImg == 0] = 0
+		limg[labelImg != label] = 0
+		# debug.show(limg)
+		# limg = np.ones_like(limg) * 255 - limg
+		# debug.show(limg)	
 		kernel = np.ones((2,2), np.uint8)
-		test_img = cv2.morphologyEx(limg, cv2.MORPH_GRADIENT, kernel)
-		subproperty_map, subcorner_list = addition_property(test_img)
+		limg = cv2.morphologyEx(limg, cv2.MORPH_GRADIENT, kernel)
+		# debug.show(limg)
+		limg = limg.astype(np.uint8)
+		
+		test_img = cv2.ximgproc.thinning(limg, thinningType=cv2.ximgproc.THINNING_GUOHALL)
+		img_closing = cv2.morphologyEx(test_img, cv2.MORPH_CLOSE, kernel)
+		limg = cv2.ximgproc.thinning(img_closing, thinningType=cv2.ximgproc.THINNING_GUOHALL)
+		# debug.show(limg)
+		
 
-		_, subclist,_ = approximate_corner(subproperty_map,subcorner_list)
+
+		subproperty_map, subcorner_list = addition_property(limg)
+		# debug.show(subproperty_map)
+		tmp, subclist,_ = approximate_corner(subproperty_map,subcorner_list,3)
+		# debug.show(tmp)
 		sub_region_point = []
-	
 		for x,y in subclist:
-			
 			sub_region_point.append([x,y])
 		sub_regions[label] = sub_region_point
-
+	
 	return sub_regions
 
