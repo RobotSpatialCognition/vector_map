@@ -101,8 +101,9 @@ class VectorMap:
 		# get subregions
 		clip_raster =copy.copy(raster)
 		_, _, _, _, labelImage = vectorize.getMovePoint(clip_raster.data)
+	
 		self.subregions = vectorize.get_subregion_points(labelImage)	
-#		print(self.subregions)
+		# print(self.subregions)
 
 	def get_denoised_raster(self):
 		return self.denoised_raster
