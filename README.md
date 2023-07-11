@@ -32,7 +32,7 @@ pip3 install -e .
 ```
 
 
-## demo
+## Demo
 - usage sample
 ```
 python3 test/test1.py
@@ -41,7 +41,12 @@ python3 test/test1.py
 - full demo  
 [pytwb_demo](https://github.com/momoiorg-repository/pytwb_demo)
 
-## document
+## Document
 [vector_map api](./doc/overview.md)
+
+## Paper
+- Wataru Mita, Johei Matsuoka, and Kazuya Tago,
+”A Vectorized Map Library as a Platform for Higher
+Layer Planning for Mobile Robots," International Workshop on Smart Info-Media Systems in Asia (SISA), IEICE, 2023 (to appear).
 
 
