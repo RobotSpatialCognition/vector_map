@@ -431,7 +431,7 @@ def search_nearpoint(sorted_corner, degree_list):
 					if dist <= distance and np.allclose(e1, e2):
 						distance = dist
 						nearest = point
-				if nearest != ():
+				if len(nearest) != 0:
 					nodes.append((corner,nearest))
 
 	return nodes
