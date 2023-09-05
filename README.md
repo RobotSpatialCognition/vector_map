@@ -17,6 +17,7 @@ automatic division of vector map<br>
 <img src="resource/picture/subregion.jpg" width=160><br>
 
 ## Install
+（Please care that numpy version should be >= 1.22.0 to run opencv)
 
 ```
 mkdir <work_dir>
