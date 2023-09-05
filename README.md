@@ -47,6 +47,6 @@ python3 test/test1.py
 ## Paper
 - Wataru Mita, Johei Matsuoka, and Kazuya Tago,
 ”A Vectorized Map Library as a Platform for Higher
-Layer Planning for Mobile Robots," International Workshop on Smart Info-Media Systems in Asia (SISA), IEICE, 2023 (to appear).
+Layer Planning for Mobile Robots," International Workshop on Smart Info-Media Systems in Asia (SISA), IEICE, 2023.
 
 
